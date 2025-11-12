@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Check if user is logged in and is a manager, otherwise redirect
+if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== 'gerente') {
+    header("Location: ../index.html"); // Redirect to login page if not authorized
+    exit();
+}
+
 require('../fpdf186/fpdf.php');
 require('db.php');
 
@@ -45,7 +53,7 @@ class PDF extends FPDF
         $this->SetFont('', 'B');
 
         // Cabecera
-        $w = array(10, 35, 30, 25, 25, 15, 25, 25); // Anchos de las columnas (ID, Nombre, Descripcion, Precio Compra, Precio Venta, Stock, Categoria, Proveedor)
+        $w = array(10, 30, 25, 20, 20, 15, 15, 25, 25); // Anchos de las columnas (ID, Nombre, Descripcion, Precio Compra, Precio Venta, Stock, Stock Minimo, Categoria, Proveedor)
         for ($i = 0; $i < count($header); $i++) {
             $this->Cell($w[$i], 7, $header[$i], 1, 0, 'C', true);
         }
@@ -65,8 +73,9 @@ class PDF extends FPDF
             $this->Cell($w[3], 6, $row['precio_compra'], 'LR', 0, 'R', $fill);
             $this->Cell($w[4], 6, $row['precio_venta'], 'LR', 0, 'R', $fill);
             $this->Cell($w[5], 6, $row['stock'], 'LR', 0, 'C', $fill);
-            $this->Cell($w[6], 6, $row['categoria_nombre'], 'LR', 0, 'L', $fill);
-            $this->Cell($w[7], 6, $row['proveedor_nombre'], 'LR', 0, 'L', $fill);
+            $this->Cell($w[6], 6, $row['stock_minimo'], 'LR', 0, 'C', $fill); // Display Stock Minimo
+            $this->Cell($w[7], 6, $row['categoria_nombre'], 'LR', 0, 'L', $fill);
+            $this->Cell($w[8], 6, $row['proveedor_nombre'], 'LR', 0, 'L', $fill);
             $this->Ln();
             $fill = !$fill;
         }
@@ -82,7 +91,7 @@ $pdf->AddPage();
 $pdf->SetFont('Arial', '', 12);
 
 // Cargar datos
-$sql = "SELECT p.id, p.nombre, p.descripcion, p.precio_compra, p.precio_venta, p.stock, c.nombre AS categoria_nombre, pr.nombre AS proveedor_nombre 
+$sql = "SELECT p.id, p.nombre, p.descripcion, p.precio_compra, p.precio_venta, p.stock, p.stock_minimo, c.nombre AS categoria_nombre, pr.nombre AS proveedor_nombre 
         FROM productos p
         LEFT JOIN categorias c ON p.id_categoria = c.id
         LEFT JOIN proveedores pr ON p.id_proveedor = pr.id
@@ -97,7 +106,7 @@ if ($result->num_rows > 0) {
 $con->close();
 
 // Títulos de las columnas
-$header = array('ID', 'Producto', 'Descripción', 'P. Compra', 'P. Venta', 'Stock', 'Categoría', 'Proveedor');
+$header = array('ID', 'Producto', 'Descripción', 'P. Compra', 'P. Venta', 'Stock', 'Stock Min.', 'Categoría', 'Proveedor');
 
 // Generar la tabla
 $pdf->FancyTable($header, $data);

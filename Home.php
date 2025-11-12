@@ -1,12 +1,14 @@
 <?php
 session_start();
 
-// Simulando un usuario para demostración si no hay sesión
-if (!isset($_SESSION['usuario'])) {
-    $_SESSION['usuario'] = 'Invitado';
+// Check if user is logged in, otherwise redirect to login page
+if (!isset($_SESSION['usuario']) || !isset($_SESSION['rol'])) {
+    header("Location: index.html");
+    exit();
 }
 
 $nomUsu = htmlspecialchars($_SESSION['usuario']);
+$rolUsu = htmlspecialchars($_SESSION['rol']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -114,6 +116,14 @@ $nomUsu = htmlspecialchars($_SESSION['usuario']);
         <li class="nav-item">
           <a class="nav-link" href="./movimientos/index.php">Movimientos</a>
         </li>
+        <?php if ($rolUsu == 'gerente'): ?>
+        <li class="nav-item">
+          <a class="nav-link" href="./usuarios/index.php">Usuarios</a>
+        </li>
+        <?php endif; ?>
+        <li class="nav-item">
+          <a class="nav-link" href="logout.php">Cerrar Sesión</a>
+        </li>
       </ul>
     </div>
   </div>
@@ -122,7 +132,7 @@ $nomUsu = htmlspecialchars($_SESSION['usuario']);
 <div class="container my-5">
     <div class="p-5 mb-4 rounded-3 welcome-card">
         <div class="container-fluid py-5 text-center">
-            <h1 class="display-5 fw-bold">Bienvenido, <?php echo $nomUsu; ?></h1>
+            <h1 class="display-5 fw-bold">Bienvenido, <?php echo $nomUsu; ?> (<?php echo $rolUsu; ?>)</h1>
             <p class="fs-4">Gestión eficiente de su inventario.</p>
         </div>
     </div>
@@ -172,6 +182,19 @@ $nomUsu = htmlspecialchars($_SESSION['usuario']);
                 </div>
             </a>
         </div>
+        <?php if ($rolUsu == 'gerente'): ?>
+        <div class="col-md-6 mb-4">
+            <a href="./usuarios/index.php" class="text-decoration-none text-white">
+                <div class="card bg-dark card-link h-100">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-3x mb-3"></i>
+                        <h5 class="card-title">Gestión de Usuarios</h5>
+                        <p class="card-text">Administre los usuarios del sistema.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
 

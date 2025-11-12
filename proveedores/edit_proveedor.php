@@ -1,7 +1,20 @@
 <?php
+session_start();
+
+// Check if user is logged in and is a manager, otherwise redirect
+if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== 'gerente') {
+    header("Location: ../index.html"); // Redirect to login page if not authorized
+    exit();
+}
+
 include 'db.php';
 $message = '';
-$id = $_GET['id'];
+$id = $_GET['id'] ?? null;
+
+if (!$id) {
+    header("Location: index.php");
+    exit();
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST['id'];
@@ -28,6 +41,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $stmt->get_result();
     $proveedor = $result->fetch_assoc();
     $stmt->close();
+
+    if (!$proveedor) {
+        header("Location: index.php");
+        exit();
+    }
 }
 ?>
 <!DOCTYPE html>

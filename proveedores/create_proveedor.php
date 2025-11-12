@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Check if user is logged in and is a manager, otherwise redirect
+if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== 'gerente') {
+    header("Location: ../index.html"); // Redirect to login page if not authorized
+    exit();
+}
+
 include 'db.php';
 $message = '';
 

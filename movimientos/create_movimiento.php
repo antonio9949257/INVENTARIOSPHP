@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Check if user is logged in and is authorized (gerente or empleado)
+if (!isset($_SESSION['usuario']) || !isset($_SESSION['rol']) || ($_SESSION['rol'] !== 'gerente' && $_SESSION['rol'] !== 'empleado')) {
+    header("Location: ../index.html"); // Redirect to login page if not authorized
+    exit();
+}
+
 include 'db.php';
 $message = '';
 
@@ -10,14 +18,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tipo_movimiento = $_POST['tipo_movimiento'];
     $cantidad = $_POST['cantidad'];
     $observaciones = $_POST['observaciones'];
+    $id_usuario = $_SESSION['id_usuario']; // Get user ID from session
 
     // Start transaction
     $con->begin_transaction();
 
     try {
         // Insert movement
-        $stmt = $con->prepare("INSERT INTO movimientos (id_producto, tipo_movimiento, cantidad, observaciones) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isis", $id_producto, $tipo_movimiento, $cantidad, $observaciones);
+        $stmt = $con->prepare("INSERT INTO movimientos (id_producto, tipo_movimiento, cantidad, observaciones, id_usuario) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("isisi", $id_producto, $tipo_movimiento, $cantidad, $observaciones, $id_usuario);
         $stmt->execute();
         $stmt->close();
 

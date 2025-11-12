@@ -1,9 +1,22 @@
 <?php
+session_start();
+
+// Check if user is logged in and is a manager, otherwise redirect
+if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== 'gerente') {
+    header("Location: ../index.html"); // Redirect to login page if not authorized
+    exit();
+}
+
 include 'db.php';
 $message = '';
-$id = $_GET['id'];
+$id = $_GET['id'] ?? null;
 
-// Fetch products for the dropdown
+if (!$id) {
+    header("Location: index.php");
+    exit();
+}
+
+// Fetch products for the dropdown (though not used for editing product, just for context if needed)
 $productos_res = $con->query("SELECT id, nombre FROM productos");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -22,12 +35,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $stmt->close();
 } else {
-    $stmt = $con->prepare("SELECT id, id_producto, tipo_movimiento, cantidad, fecha_movimiento, observaciones FROM movimientos WHERE id=?");
+    $stmt = $con->prepare("SELECT id, id_producto, tipo_movimiento, cantidad, fecha_movimiento, observaciones, id_usuario FROM movimientos WHERE id=?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result();
     $movimiento = $result->fetch_assoc();
     $stmt->close();
+
+    if (!$movimiento) {
+        header("Location: index.php");
+        exit();
+    }
 
     // Fetch product name for display
     $product_stmt = $con->prepare("SELECT nombre FROM productos WHERE id=?");
@@ -36,6 +54,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $product_result = $product_stmt->get_result();
     $product_name = $product_result->fetch_assoc()['nombre'];
     $product_stmt->close();
+
+    // Fetch user name for display
+    $user_stmt = $con->prepare("SELECT usuario FROM usuarios WHERE id=?");
+    $user_stmt->bind_param("i", $movimiento['id_usuario']);
+    $user_stmt->execute();
+    $user_result = $user_stmt->get_result();
+    $user_name = $user_result->fetch_assoc()['usuario'];
+    $user_stmt->close();
 }
 ?>
 <!DOCTYPE html>
@@ -90,6 +116,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <div class="mb-3">
                 <label for="observaciones" class="form-label">Observaciones</label>
                 <textarea class="form-control" id="observaciones" name="observaciones" rows="3"><?php echo htmlspecialchars($movimiento['observaciones']); ?></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="usuario_nombre" class="form-label">Registrado por</label>
+                <input type="text" class="form-control" id="usuario_nombre" value="<?php echo htmlspecialchars($user_name); ?>" disabled>
               </div>
               <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">Actualizar Movimiento</button>

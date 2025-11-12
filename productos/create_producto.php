@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Check if user is logged in and is a manager, otherwise redirect
+if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== 'gerente') {
+    header("Location: ../index.html"); // Redirect to login page if not authorized
+    exit();
+}
+
 include 'db.php';
 $message = '';
 
@@ -12,11 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $precio_compra = $_POST['precio_compra'];
     $precio_venta = $_POST['precio_venta'];
     $stock = $_POST['stock'];
+    $stock_minimo = $_POST['stock_minimo']; // New field
     $id_categoria = $_POST['id_categoria'];
     $id_proveedor = $_POST['id_proveedor'];
 
-    $stmt = $con->prepare("INSERT INTO productos (nombre, descripcion, precio_compra, precio_venta, stock, id_categoria, id_proveedor) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssddiii", $nombre, $descripcion, $precio_compra, $precio_venta, $stock, $id_categoria, $id_proveedor);
+    $stmt = $con->prepare("INSERT INTO productos (nombre, descripcion, precio_compra, precio_venta, stock, stock_minimo, id_categoria, id_proveedor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssddiiii", $nombre, $descripcion, $precio_compra, $precio_venta, $stock, $stock_minimo, $id_categoria, $id_proveedor);
 
     if ($stmt->execute()) {
         header("Location: index.php?status=success");
@@ -77,6 +86,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <div class="mb-3">
                 <label for="stock" class="form-label">Stock</label>
                 <input type="number" class="form-control" id="stock" name="stock" required>
+              </div>
+              <div class="mb-3">
+                <label for="stock_minimo" class="form-label">Stock Mínimo</label>
+                <input type="number" class="form-control" id="stock_minimo" name="stock_minimo" required>
               </div>
               <div class="mb-3">
                 <label for="id_categoria" class="form-label">Categoría</label>

@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// Check if user is logged in, otherwise redirect to login page
+if (!isset($_SESSION['usuario']) || !isset($_SESSION['rol'])) {
+    header("Location: ../index.html");
+    exit();
+} 
+
+$rolUsu = htmlspecialchars($_SESSION['rol']);
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -78,6 +89,14 @@
         <li class="nav-item">
           <a class="nav-link" href="../movimientos/index.php">Movimientos</a>
         </li>
+        <?php if ($rolUsu == 'gerente'): ?>
+        <li class="nav-item">
+          <a class="nav-link" href="../usuarios/index.php">Usuarios</a>
+        </li>
+        <?php endif; ?>
+        <li class="nav-item">
+          <a class="nav-link" href="../logout.php">Cerrar Sesión</a>
+        </li>
       </ul>
     </div>
   </div>
@@ -86,10 +105,12 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Lista de Proveedores</h2>
+      <?php if ($rolUsu == 'gerente'): ?>
       <div>
         <a href="create_proveedor.php" class="btn btn-primary"><i class="fas fa-plus"></i> Registrar Proveedor</a>
         <a href="generar_pdf.php" target="_blank" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Generar PDF</a>
       </div>
+      <?php endif; ?>
     </div>
     <div class="table-responsive">
       <table class="table table-dark table-striped table-hover">
@@ -101,7 +122,9 @@
             <th>Teléfono</th>
             <th>Email</th>
             <th>Dirección</th>
+            <?php if ($rolUsu == 'gerente'): ?>
             <th>Acciones</th>
+            <?php endif; ?>
           </tr>
         </thead>
         <tbody>
@@ -120,14 +143,16 @@
                   echo "<td>" . htmlspecialchars($fila["telefono"]) . "</td>";
                   echo "<td>" . htmlspecialchars($fila["email"]) . "</td>";
                   echo "<td>" . htmlspecialchars($fila["direccion"]) . "</td>";
-                  echo "<td>";
-                  echo "<a href='edit_proveedor.php?id=" . $fila["id"] . "' class='btn btn-sm btn-warning me-2'><i class='fas fa-edit'></i> Editar</a>";
-                  echo "<a href='delete_proveedor.php?id=" . $fila["id"] . "' class='btn btn-sm btn-danger'><i class='fas fa-trash'></i> Eliminar</a>";
-                  echo "</td>";
+                  if ($rolUsu == 'gerente') {
+                      echo "<td>";
+                      echo "<a href='edit_proveedor.php?id=" . $fila["id"] . "' class='btn btn-sm btn-warning me-2'><i class='fas fa-edit'></i> Editar</a>";
+                      echo "<a href='delete_proveedor.php?id=" . $fila["id"] . "' class='btn btn-sm btn-danger'><i class='fas fa-trash'></i> Eliminar</a>";
+                      echo "</td>";
+                  }
                   echo "</tr>";
               }
           } else {
-              echo "<tr><td colspan='7' class='text-center'>No se encontraron proveedores</td></tr>";
+              echo "<tr><td colspan='" . ($rolUsu == 'gerente' ? '7' : '6') . "' class='text-center'>No se encontraron proveedores</td></tr>";
           }
           $con->close();
           ?>

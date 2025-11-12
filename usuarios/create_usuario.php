@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in and is a manager, otherwise redirect
 if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== 'gerente') {
-    header("Location: ../index.html"); // Redirect to login page if not authorized
+    header("Location: ../index.php"); // Redirect to login page if not authorized
     exit();
 }
 
@@ -11,11 +11,15 @@ include 'db.php';
 $message = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nombre = $_POST['nombre'];
-    $descripcion = $_POST['descripcion'];
+    $usuario = $_POST['usuario'];
+    $clave = $_POST['clave'];
+    $rol = $_POST['rol'];
 
-    $stmt = $con->prepare("INSERT INTO categorias (nombre, descripcion) VALUES (?, ?)");
-    $stmt->bind_param("ss", $nombre, $descripcion);
+    // Hash the password
+    $hashed_password = password_hash($clave, PASSWORD_DEFAULT);
+
+    $stmt = $con->prepare("INSERT INTO usuarios (usuario, clave, rol) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $usuario, $hashed_password, $rol);
 
     if ($stmt->execute()) {
         header("Location: index.php?status=success");
@@ -31,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registrar Categoría</title>
+  <title>Registrar Usuario</title>
   <link href="../adi_bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -53,21 +57,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <div class="col-md-6">
         <div class="card bg-secondary text-light">
           <div class="card-header">
-            <h2 class="card-title mb-0"><i class="fas fa-plus-circle"></i> Registrar Nueva Categoría</h2>
+            <h2 class="card-title mb-0"><i class="fas fa-user-plus"></i> Registrar Nuevo Usuario</h2>
           </div>
           <div class="card-body">
             <?php echo $message; ?>
-            <form action="create_categoria.php" method="post">
+            <form action="create_usuario.php" method="post">
               <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre de la Categoría</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                <label for="usuario" class="form-label">Nombre de Usuario</label>
+                <input type="text" class="form-control" id="usuario" name="usuario" required>
               </div>
               <div class="mb-3">
-                <label for="descripcion" class="form-label">Descripción</label>
-                <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+                <label for="clave" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="clave" name="clave" required>
+              </div>
+              <div class="mb-3">
+                <label for="rol" class="form-label">Rol</label>
+                <select class="form-control" id="rol" name="rol" required>
+                  <option value="empleado">Empleado</option>
+                  <option value="gerente">Gerente</option>
+                </select>
               </div>
               <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Registrar Categoría</button>
+                <button type="submit" class="btn btn-primary">Registrar Usuario</button>
                 <a href="index.php" class="btn btn-secondary">Volver a la lista</a>
               </div>
             </form>

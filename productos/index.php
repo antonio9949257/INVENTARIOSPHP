@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// Check if user is logged in, otherwise redirect to login page
+if (!isset($_SESSION['usuario']) || !isset($_SESSION['rol'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$rolUsu = htmlspecialchars($_SESSION['rol']);
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -78,6 +89,14 @@
         <li class="nav-item">
           <a class="nav-link" href="../movimientos/index.php">Movimientos</a>
         </li>
+        <?php if ($rolUsu == 'gerente'): ?>
+        <li class="nav-item">
+          <a class="nav-link" href="../usuarios/index.php">Usuarios</a>
+        </li>
+        <?php endif; ?>
+        <li class="nav-item">
+          <a class="nav-link" href="../logout.php">Cerrar Sesión</a>
+        </li>
       </ul>
     </div>
   </div>
@@ -86,10 +105,12 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Lista de Productos</h2>
+      <?php if ($rolUsu == 'gerente'): ?>
       <div>
         <a href="create_producto.php" class="btn btn-primary"><i class="fas fa-plus"></i> Registrar Producto</a>
         <a href="generar_pdf.php" target="_blank" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Generar PDF</a>
       </div>
+      <?php endif; ?>
     </div>
     <div class="table-responsive">
       <table class="table table-dark table-striped table-hover">
@@ -101,16 +122,19 @@
             <th>Precio Compra</th>
             <th>Precio Venta</th>
             <th>Stock</th>
+            <th>Stock Mínimo</th> <!-- Added Stock Mínimo column header -->
             <th>Categoría</th>
             <th>Proveedor</th>
+            <?php if ($rolUsu == 'gerente'): ?>
             <th>Acciones</th>
+            <?php endif; ?>
           </tr>
         </thead>
         <tbody>
           <?php
           include 'db.php';
   
-          $sql = "SELECT p.id, p.nombre, p.descripcion, p.precio_compra, p.precio_venta, p.stock, c.nombre AS categoria_nombre, pr.nombre AS proveedor_nombre 
+          $sql = "SELECT p.id, p.nombre, p.descripcion, p.precio_compra, p.precio_venta, p.stock, p.stock_minimo, c.nombre AS categoria_nombre, pr.nombre AS proveedor_nombre 
                   FROM productos p
                   LEFT JOIN categorias c ON p.id_categoria = c.id
                   LEFT JOIN proveedores pr ON p.id_proveedor = pr.id";
@@ -125,16 +149,19 @@
                   echo "<td>" . htmlspecialchars($fila["precio_compra"]) . "</td>";
                   echo "<td>" . htmlspecialchars($fila["precio_venta"]) . "</td>";
                   echo "<td>" . htmlspecialchars($fila["stock"]) . "</td>";
+                  echo "<td>" . htmlspecialchars($fila["stock_minimo"]) . "</td>"; // Display Stock Mínimo
                   echo "<td>" . htmlspecialchars($fila["categoria_nombre"]) . "</td>";
                   echo "<td>" . htmlspecialchars($fila["proveedor_nombre"]) . "</td>";
-                  echo "<td>";
-                  echo "<a href='edit_producto.php?id=" . $fila["id"] . "' class='btn btn-sm btn-warning me-2'><i class='fas fa-edit'></i> Editar</a>";
-                  echo "<a href='delete_producto.php?id=" . $fila["id"] . "' class='btn btn-sm btn-danger'><i class='fas fa-trash'></i> Eliminar</a>";
-                  echo "</td>";
+                  if ($rolUsu == 'gerente') {
+                      echo "<td>";
+                      echo "<a href='edit_producto.php?id=" . $fila["id"] . "' class='btn btn-sm btn-warning me-2'><i class='fas fa-edit'></i> Editar</a>";
+                      echo "<a href='delete_producto.php?id=" . $fila["id"] . "' class='btn btn-sm btn-danger'><i class='fas fa-trash'></i> Eliminar</a>";
+                      echo "</td>";
+                  }
                   echo "</tr>";
               }
           } else {
-              echo "<tr><td colspan='9' class='text-center'>No se encontraron productos</td></tr>";
+              echo "<tr><td colspan='" . ($rolUsu == 'gerente' ? '10' : '9') . "' class='text-center'>No se encontraron productos</td></tr>";
           }
           $con->close();
           ?>

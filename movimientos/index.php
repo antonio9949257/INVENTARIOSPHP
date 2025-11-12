@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// Check if user is logged in, otherwise redirect to login page
+if (!isset($_SESSION['usuario']) || !isset($_SESSION['rol'])) {
+    header("Location: ../index.html");
+    exit();
+}
+
+$rolUsu = htmlspecialchars($_SESSION['rol']);
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -76,7 +87,15 @@
           <a class="nav-link" href="../productos/index.php">Productos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../movimientos/index.php">Movimientos</a>
+          <a class="nav-link active" aria-current="page" href="index.php">Movimientos</a>
+        </li>
+        <?php if ($rolUsu == 'gerente'): ?>
+        <li class="nav-item">
+          <a class="nav-link" href="../usuarios/index.php">Usuarios</a>
+        </li>
+        <?php endif; ?>
+        <li class="nav-item">
+          <a class="nav-link" href="../logout.php">Cerrar Sesión</a>
         </li>
       </ul>
     </div>
@@ -86,10 +105,12 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Lista de Movimientos</h2>
+      <?php if ($rolUsu == 'gerente' || $rolUsu == 'empleado'): ?>
       <div>
         <a href="create_movimiento.php" class="btn btn-primary"><i class="fas fa-plus"></i> Registrar Movimiento</a>
         <a href="generar_pdf.php" target="_blank" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Generar PDF</a>
       </div>
+      <?php endif; ?>
     </div>
     <div class="table-responsive">
       <table class="table table-dark table-striped table-hover">
@@ -101,16 +122,20 @@
             <th>Cantidad</th>
             <th>Fecha Movimiento</th>
             <th>Observaciones</th>
+            <th>Usuario</th> <!-- Added User column header -->
+            <?php if ($rolUsu == 'gerente'): ?>
             <th>Acciones</th>
+            <?php endif; ?>
           </tr>
         </thead>
         <tbody>
           <?php
           include 'db.php';
   
-          $sql = "SELECT m.id, p.nombre AS producto_nombre, m.tipo_movimiento, m.cantidad, m.fecha_movimiento, m.observaciones 
+          $sql = "SELECT m.id, p.nombre AS producto_nombre, m.tipo_movimiento, m.cantidad, m.fecha_movimiento, m.observaciones, u.usuario AS usuario_nombre
                   FROM movimientos m
-                  JOIN productos p ON m.id_producto = p.id";
+                  JOIN productos p ON m.id_producto = p.id
+                  LEFT JOIN usuarios u ON m.id_usuario = u.id"; // Joined with users table
           $res = $con->query($sql);
   
           if ($res->num_rows > 0) {
@@ -122,14 +147,17 @@
                   echo "<td>" . htmlspecialchars($fila["cantidad"]) . "</td>";
                   echo "<td>" . htmlspecialchars($fila["fecha_movimiento"]) . "</td>";
                   echo "<td>" . htmlspecialchars($fila["observaciones"]) . "</td>";
-                  echo "<td>";
-                  echo "<a href='edit_movimiento.php?id=" . $fila["id"] . "' class='btn btn-sm btn-warning me-2'><i class='fas fa-edit'></i> Editar</a>";
-                  echo "<a href='delete_movimiento.php?id=" . $fila["id"] . "' class='btn btn-sm btn-danger'><i class='fas fa-trash'></i> Eliminar</a>";
-                  echo "</td>";
+                  echo "<td>" . htmlspecialchars($fila["usuario_nombre"]) . "</td>"; // Display User
+                  if ($rolUsu == 'gerente') {
+                      echo "<td>";
+                      echo "<a href='edit_movimiento.php?id=" . $fila["id"] . "' class='btn btn-sm btn-warning me-2'><i class='fas fa-edit'></i> Editar</a>";
+                      echo "<a href='delete_movimiento.php?id=" . $fila["id"] . "' class='btn btn-sm btn-danger'><i class='fas fa-trash'></i> Eliminar</a>";
+                      echo "</td>";
+                  }
                   echo "</tr>";
               }
           } else {
-              echo "<tr><td colspan='7' class='text-center'>No se encontraron movimientos</td></tr>";
+              echo "<tr><td colspan='" . ($rolUsu == 'gerente' ? '8' : '7') . "' class='text-center'>No se encontraron movimientos</td></tr>";
           }
           $con->close();
           ?>

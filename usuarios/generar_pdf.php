@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in and is a manager, otherwise redirect
 if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== 'gerente') {
-    header("Location: ../index.html"); // Redirect to login page if not authorized
+    header("Location: ../index.php"); // Redirect to login page if not authorized
     exit();
 }
 
@@ -23,7 +23,7 @@ class PDF extends FPDF
         $this->Cell(80);
         // Título
         $this->SetTextColor(40, 40, 40);
-        $this->Cell(30, 10, 'Listado de Movimientos', 0, 0, 'C');
+        $this->Cell(30, 10, 'Listado de Usuarios', 0, 0, 'C');
         // Fecha
         $this->SetFont('Arial', '', 10);
         $this->Cell(80, 10, date('d/m/Y'), 0, 1, 'R');
@@ -53,7 +53,7 @@ class PDF extends FPDF
         $this->SetFont('', 'B');
 
         // Cabecera
-        $w = array(10, 40, 25, 20, 35, 30, 30); // Anchos de las columnas (ID, Producto, Tipo, Cantidad, Fecha, Observaciones, Usuario)
+        $w = array(20, 80, 80); // Anchos de las columnas (ID, Usuario, Rol)
         for ($i = 0; $i < count($header); $i++) {
             $this->Cell($w[$i], 7, $header[$i], 1, 0, 'C', true);
         }
@@ -68,12 +68,8 @@ class PDF extends FPDF
         $fill = false;
         foreach ($data as $row) {
             $this->Cell($w[0], 6, $row['id'], 'LR', 0, 'C', $fill);
-            $this->Cell($w[1], 6, $row['producto_nombre'], 'LR', 0, 'L', $fill);
-            $this->Cell($w[2], 6, $row['tipo_movimiento'], 'LR', 0, 'C', $fill);
-            $this->Cell($w[3], 6, $row['cantidad'], 'LR', 0, 'R', $fill);
-            $this->Cell($w[4], 6, $row['fecha_movimiento'], 'LR', 0, 'C', $fill);
-            $this->Cell($w[5], 6, $row['observaciones'], 'LR', 0, 'L', $fill);
-            $this->Cell($w[6], 6, $row['usuario_nombre'], 'LR', 0, 'L', $fill); // Display User
+            $this->Cell($w[1], 6, $row['usuario'], 'LR', 0, 'L', $fill);
+            $this->Cell($w[2], 6, $row['rol'], 'LR', 0, 'L', $fill);
             $this->Ln();
             $fill = !$fill;
         }
@@ -89,11 +85,7 @@ $pdf->AddPage();
 $pdf->SetFont('Arial', '', 12);
 
 // Cargar datos
-$sql = "SELECT m.id, p.nombre AS producto_nombre, m.tipo_movimiento, m.cantidad, m.fecha_movimiento, m.observaciones, u.usuario AS usuario_nombre
-        FROM movimientos m
-        JOIN productos p ON m.id_producto = p.id
-        LEFT JOIN usuarios u ON m.id_usuario = u.id
-        ORDER BY m.fecha_movimiento DESC";
+$sql = "SELECT id, usuario, rol FROM usuarios ORDER BY usuario ASC";
 $result = $con->query($sql);
 $data = array();
 if ($result->num_rows > 0) {
@@ -104,7 +96,7 @@ if ($result->num_rows > 0) {
 $con->close();
 
 // Títulos de las columnas
-$header = array('ID', 'Producto', 'Tipo', 'Cantidad', 'Fecha', 'Observaciones', 'Usuario');
+$header = array('ID', 'Usuario', 'Rol');
 
 // Generar la tabla
 $pdf->FancyTable($header, $data);

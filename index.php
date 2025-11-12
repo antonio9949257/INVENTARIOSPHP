@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -55,6 +56,12 @@
 <body>
 	<div class="login-card">
 		<h2>FORMULARIO DE LOGIN</h2>
+		<?php
+		if (isset($_SESSION['error_message'])) {
+			echo '<div class="alert alert-danger text-center" role="alert">' . $_SESSION['error_message'] . '</div>';
+			unset($_SESSION['error_message']); // Clear the message after displaying
+		}
+		?>
 		<form action="Validar.php" method="POST">
 			<div class="mb-3">
 				<input type="text" class="form-control" placeholder="Usuario" name="usuario" required>
