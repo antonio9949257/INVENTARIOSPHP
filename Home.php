@@ -15,10 +15,10 @@ $total_movimientos = $con->query("SELECT COUNT(*) as count FROM movimientos")->f
     <div id="homeCarousel" class="carousel slide mb-4 rounded-3" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="<?php echo BASE_URL; ?>img/tiendasliderfamacorp.jpeg" class="d-block w-100 home-banner" alt="FarmaCorp Tienda 1">
+                <img src="<?php echo BASE_URL; ?>img/farma2.png" class="d-block w-100 home-banner" alt="FarmaCorp Tienda 1">
             </div>
             <div class="carousel-item">
-                <img src="<?php echo BASE_URL; ?>img/sjliderfarmacorpt.jpeg" class="d-block w-100 home-banner" alt="FarmaCorp Tienda 2">
+                <img src="<?php echo BASE_URL; ?>img/farma1.png" class="d-block w-100 home-banner" alt="FarmaCorp Tienda 2">
             </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">

@@ -10,7 +10,7 @@ require_once __DIR__ . '/../templates/header.php';
             <?php if ($rolUsu == 'gerente' || $rolUsu == 'empleado'): ?>
             <div>
                 <a href="create_movimiento.php" class="btn btn-primary"><i class="fas fa-plus"></i> Registrar Movimiento</a>
-                <a href="generar_pdf.php" target="_blank" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Generar PDF</a>
+                <a href="<?php echo BASE_URL; ?>movimientos/generar_pdf.php" target="_blank" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Generar PDF</a>
             </div>
             <?php endif; ?>
         </div>
@@ -54,7 +54,7 @@ require_once __DIR__ . '/../templates/header.php';
                             if ($rolUsu == 'gerente') {
                                 echo "<td>";
                                 echo "<a href='edit_movimiento.php?id=" . $row["id"] . "' class='btn btn-sm btn-warning me-2'><i class='fas fa-edit'></i> Editar</a>";
-                                echo "<a href='delete_movimiento.php?id=" . $row["id"] . "' class='btn btn-sm btn-danger' onclick=\"return confirm('¿Estás seguro de que quieres eliminar este movimiento?');\"><i class='fas fa-trash'></i> Eliminar</a>";
+                                echo "<a href='delete_movimiento.php?id=" . $row["id"] . "' class='btn btn-sm btn-danger' onclick=\"return confirm('&iquest;Est&aacute;s seguro de que quieres eliminar este movimiento?');\"><i class='fas fa-trash'></i> Eliminar</a>";
                                 echo "</td>";
                             }
                             echo "</tr>";

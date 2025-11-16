@@ -2,7 +2,7 @@
 session_start();
 
 
-if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== 'gerente') {
+if (!isset($_SESSION['usuario']) || ($_SESSION['rol'] !== 'gerente' && $_SESSION['rol'] !== 'empleado')) {
     header("Location: ../index.html"); 
     exit();
 }
