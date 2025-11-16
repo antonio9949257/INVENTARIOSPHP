@@ -7,14 +7,16 @@ CREATE TABLE IF NOT EXISTS movimientos (
     cantidad INT NOT NULL,
     fecha_movimiento DATETIME DEFAULT CURRENT_TIMESTAMP,
     observaciones TEXT,
-    id_usuario INT, -- Added id_usuario column
+    id_usuario INT,
     FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE SET NULL -- Foreign key to users table
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE SET NULL
 );
 
--- Assuming 'Armin' (the default user) has id = 1 in the 'usuarios' table
 INSERT INTO movimientos (id_producto, tipo_movimiento, cantidad, observaciones, id_usuario) VALUES
-(1, 'entrada', 10, 'Compra inicial de laptops', 1),
-(2, 'entrada', 50, 'Compra inicial de camisetas', 1),
-(1, 'salida', 2, 'Venta a cliente X', 1),
-(3, 'entrada', 100, 'Reposición de stock de arroz', 1);
+(1, 'entrada', 200, 'Pedido inicial a PharmaGlobal', 1),
+(2, 'entrada', 300, 'Pedido inicial a SaludVital', 1),
+(3, 'entrada', 50, 'Pedido inicial a MedEquip', 1),
+(4, 'entrada', 1000, 'Stock de contingencia', 1),
+(1, 'salida', 10, 'Venta a cliente minorista', 1),
+(2, 'salida', 25, 'Venta a cliente minorista', 1),
+(5, 'entrada', 150, 'Nuevo lote de PharmaGlobal', 1);

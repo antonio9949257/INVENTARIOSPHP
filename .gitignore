@@ -1,9 +1,8 @@
-# Compressed files
 *.rar
 *.zip
 *.tar.gz
 
-# IDE / Editor specific files
 .vscode/
 .idea/
 *.swp
+config.php

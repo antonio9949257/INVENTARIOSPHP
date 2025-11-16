@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS categorias (
 );
 
 INSERT INTO categorias (nombre, descripcion) VALUES
-('Electrónica', 'Dispositivos electrónicos y accesorios'),
-('Ropa', 'Prendas de vestir y accesorios de moda'),
-('Alimentos', 'Productos alimenticios no perecederos'),
-('Hogar', 'Artículos para el hogar y decoración');
+('Medicamentos sin receta', 'Analgésicos, antiinflamatorios y otros de venta libre.'),
+('Cuidado Personal', 'Productos de higiene, cuidado de la piel y cabello.'),
+('Equipamiento Médico', 'Tensiómetros, termómetros y otros equipos.'),
+('Primeros Auxilios', 'Vendas, desinfectantes, gasas y otros productos para curaciones.');
