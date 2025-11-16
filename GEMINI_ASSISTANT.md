@@ -2,7 +2,7 @@
 
 ¡El asistente de inventario de tu farmacia está listo!
 
-Puedes ir a `chat_gerente.php` y empezar a hacerle preguntas usando las nuevas funcionalidades. Aquí tienes algunos ejemplos de lo que puedes preguntarle:
+Puedes ir a `chat_asistente.php` y empezar a hacerle preguntas usando las nuevas funcionalidades. Aquí tienes algunos ejemplos de lo que puedes preguntarle:
 
 ### **Consultas Disponibles:**
 
